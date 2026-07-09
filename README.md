@@ -25,7 +25,7 @@ The backbone is a DiT-S/2 style transformer (Peebles & Xie, 2023) with patchific
 
 All evaluations use 50K generated samples, Heun sampling, and FID computed against the CIFAR-10 training set using Inception-v3 features.
 
-![FID vs NFE](assets/fid_vs_nfe.png)
+![FID vs NFE]
 
 | Model | Steps | NFE | FID ↓ | Precision ↑ | Recall ↑ |
 |-------|-------|-----|-------|-------------|----------|
