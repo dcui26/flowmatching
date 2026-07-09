@@ -25,7 +25,7 @@ The backbone is a DiT-S/2 style transformer (Peebles & Xie, 2023) with patchific
 
 All evaluations use 50K generated samples, Heun sampling, and FID computed against the CIFAR-10 training set using Inception-v3 features.
 
-![FID vs NFE]
+[FID vs NFE]
 
 | Model | Steps | NFE | FID ↓ | Precision ↑ | Recall ↑ |
 |-------|-------|-----|-------|-------------|----------|
@@ -36,6 +36,9 @@ All evaluations use 50K generated samples, Heun sampling, and FID computed again
 | CFM | 5 | 10 | 119.10 | 0.4318 | 0.1386 |
 | CFM | 2 | 4 | 333.08 | 0.6197 | 0.0003 |
 | CFM | 1 | 2 | 476.80 | 0.0000 | 0.0000 |
+
+| Model | Steps | NFE | FID ↓ | Precision ↑ | Recall ↑ |
+|-------|-------|-----|-------|-------------|----------|
 | Reflow | 100 | 200 | 11.92 | 0.7115 | 0.6381 |
 | Reflow | 50 | 100 | 12.01 | 0.7087 | 0.6358 |
 | Reflow | 25 | 50 | 11.91 | 0.7136 | 0.6315 |
