@@ -1,12 +1,10 @@
 # Flow Matching and Rectified Flow on CIFAR-10
 
-A from-scratch implementation of Conditional Flow Matching (CFM) and Rectified Flow (Reflow) for unconditional image generation on CIFAR-10, demonstrating that reflow enables few-step generation with minimal quality loss.
+An implementation of Conditional Flow Matching (CFM) and Rectified Flow (Reflow) for unconditional image generation on CIFAR-10. Compares the two methods across different amounts of simulation steps from 1 to 100, showing the tradeoff between peak sample quality and few-step generation efficiency
 
 ## Overview
 
-Flow matching learns a velocity field that transports noise to data via an ODE. At inference, the ODE must be numerically integrated — more steps means higher quality but slower generation. Rectified flow (reflow) straightens the learned trajectories by training a second model on (noise, generated image) couplings from the first, reducing the integration error and enabling accurate generation in far fewer steps.
-
-This project implements both methods end-to-end and evaluates them across a range of step budgets to quantify the speedup from reflow.
+Flow matching learns a velocity field that transports noise to data via an ODE. At inference time, the ODE is simulated to obtain a sample from noise, requiring an approximation of the trajectory due to integration across time being intractable. Rectified flow (reflow) straightens the learned trajectories by training a second model on (noise, generated image) couplings from the first, reducing the integration approximation error and enabling accurate generation in far fewer steps.
 
 ## Architecture
 
@@ -19,9 +17,9 @@ The backbone is a DiT-S/2 style transformer (Peebles & Xie, 2023) with patchific
 
 ## Training
 
-**CFM**: 500 epochs (~195K steps) on CIFAR-10 training set. AdamW with lr=2e-4, no weight decay, constant LR schedule with 2500-step linear warmup. EMA decay 0.9999 with 5-epoch warmup. Trained on a single NVIDIA A40.
+**CFM**: ~195K steps on CIFAR-10 training set. AdamW with lr=2e-4, no weight decay, batch size 128, constant LR schedule with 2500-step linear warmup. EMA decay 0.9999 with 5-epoch warmup.
 
-**Reflow**: 300 epochs (~117K steps) on 50K (x₀, x₁) couplings extracted from the CFM EMA model using 100-step Heun sampling. Same optimizer and architecture, trained from scratch.
+**Reflow**: ~117K steps on 50K (x₀, x₁) couplings extracted from the CFM EMA model using 100-step Heun sampling. Same optimizer and architecture, trained from scratch.
 
 ## Results
 
@@ -54,42 +52,9 @@ All evaluations use 50K generated samples, Heun sampling, and FID computed again
 
 **The crossover occurs at ~25 steps (50 NFE).** Below this point, reflow outperforms CFM at matched compute. At 10 steps, the gap is 4x (12.32 vs 48.18).
 
-**Reflow trades peak quality for robustness.** At 100 Heun steps, CFM achieves FID 7.86 vs reflow's 11.92. This is expected — reflow trains on a finite set of 50K couplings rather than the full data distribution, which slightly limits diversity (recall 0.64 vs 0.68).
+**Reflow trades peak quality for robustness.** At high step counts, CFM achieves better peak quality (FID 7.86 vs 11.92) since the reflow model trains on generated samples rather than real data, inheriting imperfections from the parent model.
 
 **Single-step generation requires multiple reflow rounds.** One round of reflow is not sufficient for 1-step generation (FID 169). The literature shows 2–3 successive rounds of reflow are needed to achieve true single-step quality.
-
-## Usage
-
-### Training CFM
-```bash
-python train_cfm.py \
-    --epochs 500 --lr 2e-4 --batch_size 128 --wd 0 \
-    --lr_schedule constant --warmup_steps 2500 \
-    --save_dir ./cfm_runs
-```
-
-### Extracting couplings
-```bash
-python extract_coupling.py \
-    --ckpt_path ./cfm_runs/checkpoint_500.pt \
-    --coupling_size 50000 \
-    --output_dir ./rectify_runs
-```
-
-### Training Reflow
-```bash
-python train_rectify.py \
-    --epochs 300 --lr 2e-4 --batch_size 128 --wd 0 \
-    --warmup_steps 2500 \
-    --save_dir ./rectify_runs
-```
-
-### Evaluation
-```bash
-python eval.py \
-    --ckpt_path ./cfm_runs/checkpoint_500.pt \
-    --num_samples 50000 --num_steps 100 --heun
-```
 
 ## File structure
 
