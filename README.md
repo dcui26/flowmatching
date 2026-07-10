@@ -1,6 +1,6 @@
 # Flow Matching and Rectified Flow on CIFAR-10
 
-An implementation of Conditional Flow Matching (CFM) and Rectified Flow (Reflow) for unconditional image generation on CIFAR-10 with a transformer backbone model. Compares the two methods across different amounts of simulation steps from 1 to 100, showing the tradeoff between peak sample quality and few-step generation efficiency
+An implementation of Conditional Flow Matching (CFM) and Rectified Flow (Reflow) for unconditional image generation on CIFAR-10 with a transformer backbone. Compares the two methods across different amounts of simulation steps from 1 to 100, showing the tradeoff between peak sample quality and few-step generation efficiency
 
 ## Overview
 
